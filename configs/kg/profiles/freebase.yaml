@@ -1,0 +1,19 @@
+schema_version: 1
+profile_name: freebase
+active_graph: freebase
+allowed_graphs: [freebase]
+graphs:
+  freebase:
+    snapshot_id: "freebase@configured-endpoint"
+    adapter: freebase_sparql
+    transport:
+      kind: direct
+    service:
+      sparql_endpoint: "${KGQA_SPARQL_ENDPOINT:-http://127.0.0.1:3001/sparql}"
+    expected_capabilities:
+      scope: global
+      reverse_edges_materialized: false
+      supports_literals: true
+policy: {}
+reliability:
+  request_timeout_seconds: 15

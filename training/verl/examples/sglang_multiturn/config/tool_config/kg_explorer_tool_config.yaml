@@ -1,0 +1,37 @@
+tools:
+  - class_name: quarl.tool.kg_explorer_tool.KGExplorerTool
+    config:
+      type: native
+      operation: get_relations
+      runtime_config_path: ${oc.env:KGQA_RESOLVED_CONFIG}
+    tool_schema:
+      type: function
+      function:
+        name: get_relations
+        description: Return selectable relation aliases connected to an entity in the configured knowledge graph.
+        parameters:
+          type: object
+          properties:
+            entity:
+              type: string
+              description: An exact entity alias from the question or a previous tool result.
+          required: [entity]
+  - class_name: quarl.tool.kg_explorer_tool.KGExplorerTool
+    config:
+      type: native
+      operation: get_triples
+      runtime_config_path: ${oc.env:KGQA_RESOLVED_CONFIG}
+    tool_schema:
+      type: function
+      function:
+        name: get_triples
+        description: Return canonical triples for relation aliases copied from the latest get_relations result.
+        parameters:
+          type: object
+          properties:
+            entity:
+              type: string
+            relations:
+              type: array
+              items: {type: string}
+          required: [entity, relations]

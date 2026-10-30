@@ -1,0 +1,33 @@
+schema_version: 1
+profile_name: freebase_training
+active_graph: freebase
+allowed_graphs: [freebase]
+graphs:
+  freebase:
+    # Shares the graph identity used by the direct Freebase profile.
+    snapshot_id: "freebase@direct-sparql"
+    adapter: freebase_direct_sparql
+    transport:
+      kind: direct
+    service:
+      sparql_endpoint: "${KGQA_SPARQL_ENDPOINT:-http://127.0.0.1:3001/sparql}"
+      # Dataset type selects the relation whitelist for the Freebase benchmark.
+      dataset_type: "${KGQA_DATASET_TYPE:-cwq}"
+      full_list: false
+      # Uses OPENAI_* env (same as KGQATool). Set false to debug whitelist+BM25 only.
+      enable_llm_relation_filter: true
+    expected_capabilities:
+      scope: global
+      reverse_edges_materialized: false
+      supports_literals: true
+policy:
+  # KGQATool: top_k = max_relations * 3, then LLM, then truncate to max_relations.
+  relation_candidate_limit: 60
+  max_relations: 20
+  max_requested_relations: 4
+  # KGQATool.execute hardcodes limit_per_relation=5.
+  max_triples_per_relation: 5
+  max_triples_total: 60
+  preserve_backend_order: true
+reliability:
+  request_timeout_seconds: 15

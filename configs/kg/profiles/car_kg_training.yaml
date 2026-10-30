@@ -1,0 +1,25 @@
+schema_version: 1
+profile_name: car_kg_training
+active_graph: car_kg
+allowed_graphs: [car_kg]
+graphs:
+  car_kg:
+    snapshot_id: "car-kg-benchmark-v2+sha256:05b30c36dd5962864a35236d25e6bc51d8c197bb14b31aeec7bab2cf50e9363b"
+    adapter: global_array
+    transport:
+      # Embedded mmap (same pattern as gtsqa_training). Training workers open the
+      # index directly — no Freebase Virtuoso and no HTTP sidecar required.
+      kind: embedded
+    service:
+      index_path: "${CAR_KG_INDEX_PATH:-./data/database/kg-platform-car-kg-index}"
+    expected_capabilities:
+      scope: global
+      reverse_edges_materialized: false
+      supports_literals: false
+policy:
+  relation_candidate_limit: 200
+  max_relations: 50
+  max_requested_relations: 4
+  max_triples_per_relation: 20
+  max_triples_total: 60
+reliability: {}

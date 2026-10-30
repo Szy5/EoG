@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evolve on Graph (EoG)</title>
+<meta name="description" content="Evolve on Graph (EoG): an LLM self-evolves its knowledge graph reasoning through Proposer–Solver self-play on symbolically verifiable tasks, without any question annotations.">
+<meta property="og:title" content="Evolve on Graph: Self-Evolving Knowledge Graph Reasoning without Question Annotations">
+<meta property="og:description" content="One LLM proposes KG-verified questions and learns to solve them, without question–answer annotations.">
+<meta property="og:image" content="static/img/main_methods.png">
+<link rel="icon" type="image/png" href="static/img/favicon.png">
+<link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="wrap nav" aria-label="Main">
+    <a class="brand" href="#top"><img src="static/img/logo.png" alt="" width="28" height="28"><span>EoG</span></a>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#case">Case</a>
+      <a href="#citation">Citation</a>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ================= TITLE ================= -->
+<section class="hero">
+  <div class="wrap">
+    <h1>Evolve on Graph: Self-Evolving Knowledge Graph Reasoning without Question Annotations</h1>
+    <p class="authors"><span class="nw">Zongyuan Sun<sup>1,*</sup></span>, <span class="nw">Shuai Zhao<sup>1,†</sup></span>, <span class="nw">Ke Shu<sup>2,*</sup></span>, <span class="nw">Ziyue Zhu<sup>1</sup></span>, <span class="nw">Shangyang Wu<sup>1</sup></span>, <span class="nw">Yuanlin Lin<sup>1</sup></span>, <span class="nw">Tao Wang<sup>1</sup></span>, <span class="nw">Shiyue Li<sup>1</sup></span>, <span class="nw">Yingjun Du<sup>3</sup></span>, <span class="nw">Anh Tuan Luu<sup>4</sup></span>, <span class="nw">Haoran Luo<sup>4,†</sup></span></p>
+    <p class="affiliations"><span class="nw"><sup>1</sup>Beijing University of Posts and Telecommunications</span> <span class="nw"><sup>2</sup>University of Helsinki</span> <span class="nw"><sup>3</sup>University of Amsterdam</span> <span class="nw"><sup>4</sup>Nanyang Technological University</span></p>
+    <p class="affiliations"><span class="nw"><sup>*</sup>Equal contribution</span> <span class="nw"><sup>†</sup>Corresponding authors</span></p>
+    <div class="buttons">
+      <!-- TODO: link Models / Data once they are released. -->
+      <a class="btn" href="https://arxiv.org/abs/2610.35598">Paper</a>
+      <a class="btn" href="https://github.com/Szy5/EoG">Code</a>
+      <span class="btn off" aria-disabled="true" title="Coming soon">Models</span>
+      <span class="btn off" aria-disabled="true" title="Coming soon">Data</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OVERVIEW ================= -->
+<section class="band" id="overview">
+  <div class="wrap">
+    <h2>Reasoning on Knowledge Graphs without Question Annotations</h2>
+    <div class="prose">
+      <p>Knowledge graphs give large language models reliable facts for multi-hop reasoning, yet most KGs in real-world domains such as finance and industry have no question–answer annotations. Without them, existing methods struggle to improve LLM graph reasoning: training-free agents cannot improve their exploration through interaction, reinforcement-learning agents depend on QA data annotated by humans or synthesized by other models, and training data built offline has a fixed topology mix that cannot follow the agent's ability.</p>
+      <p>We propose <strong>Evolve on Graph (EoG)</strong>, which lets an LLM self-evolve its graph reasoning using only the KG itself. Through <strong>Graph Self-Play</strong>, a single LLM alternates between a Proposer that poses questions and a Solver that answers them by exploring the graph. <strong>Symbolically Verifiable Topology Synthesis (SVTS)</strong> samples reasoning topologies on the KG and executes the corresponding logic queries, so every task comes with a correct and complete answer set. A <strong>Boundary-Aware Graph Curriculum</strong> rewards the Proposer by the variance of the Solver's scores, which keeps questions at the Solver's capability boundary and lets complex topologies enter training as the Solver improves.</p>
+      <p>On six benchmarks over Freebase, Wikidata and an industrial automotive KG, EoG outperforms prompting-, retrieval- and agent-based methods. With Qwen2.5-7B-Instruct it reaches 61.55 average Hit@1 on five public benchmarks, 7.46 points above the strongest annotation-free baseline, showing that LLM graph reasoning can improve through self-play without QA annotations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METHOD ================= -->
+<section class="band alt" id="method">
+  <div class="wrap">
+    <h2>How EoG Works: One LLM, Two Roles, One Graph</h2>
+    <figure class="plate"><img src="static/img/main_methods.png" alt="EoG framework: SVTS synthesizes verifiable tasks; one LLM self-plays as Proposer and Solver, trained with REINFORCE and GRPO" width="2304" height="806" data-zoom>
+      <figcaption>Overview of EoG. SVTS builds verifiable tasks from the KG; one LLM self-plays as the Proposer and the Solver, and the Proposer is rewarded for questions on the Solver's capability boundary.</figcaption></figure>
+    <div class="boxes">
+      <div class="box">
+        <h3>Graph Self-Play</h3>
+        <p>One policy alternates between the Proposer and the Solver. Both roles explore the same graph with <code>get_relations</code> and <code>get_triples</code>, so the model gains exploration experience whether it poses or answers a question.</p>
+      </div>
+      <div class="box">
+        <h3>SVTS</h3>
+        <p>Symbolically Verifiable Topology Synthesis grounds logical query patterns on real facts and executes the queries on the KG, so every task comes with a correct and complete gold answer set. Each Proposer question is kept only if a verifier can answer it from the triples the Proposer retrieved.</p>
+      </div>
+      <div class="box">
+        <h3>Boundary-Aware Graph Curriculum</h3>
+        <p>The Proposer is rewarded by the variance of the Solver's scores on its question. Questions on the Solver's capability boundary score highest, so complex topologies enter training as the Solver improves.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section class="band" id="results">
+  <div class="wrap">
+    <h2>Results on Six Benchmarks over Three Knowledge Graphs</h2>
+    <div class="prose">
+      <p>We evaluate on six benchmarks over three KGs: WebQSP, CWQ and GrailQA over Freebase, GTSQA and WikiWebQuestions over Wikidata, and IndustryCarBench over an industrial automotive KG. The table reports Hit@1 / F1 (%); bold marks the best result in each column for the selected backbone.</p>
+    </div>
+    <div class="tabs" role="tablist" id="backbone-tabs"></div>
+    <div class="table-scroll"><table id="main-table"></table></div>
+
+    <div class="two">
+      <div class="prose">
+        <h3>A KG with no training questions</h3>
+        <p>IndustryCarBench has 500 expert-written questions over a real automotive KG and no training set, so annotation-based RL agents cannot be trained on it. EoG trains on the KG alone and exceeds the strongest baseline, ToG, by 17.80 Hit@1.</p>
+        <div class="table-scroll"><table class="small-table">
+          <thead><tr><th>Method</th><th>Hit@1</th><th>F1</th></tr></thead>
+          <tbody>
+            <tr><td>ToG</td><td>67.00</td><td>53.94</td></tr>
+            <tr><td>PoG</td><td>56.60</td><td>47.27</td></tr>
+            <tr><td>Graph Reranker</td><td>49.80</td><td>40.64</td></tr>
+            <tr><td>CoR</td><td>29.20</td><td>23.76</td></tr>
+            <tr><td>Text-Based Retrieval</td><td>25.60</td><td>23.31</td></tr>
+            <tr class="eog"><td>EoG</td><td class="best">84.80</td><td class="best">78.16</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="prose">
+        <h3>The curriculum follows the Solver</h3>
+        <p>As the Solver improves, the Proposer's synthesis success rate on complex topologies rises from 17.9% to 31.3% while simple topologies level off near 34%, without any manual difficulty schedule.</p>
+        <figure class="plate"><img src="static/img/RQ4_topology_easy_hard_v2.png" alt="Proposer synthesis success rate on simple and complex topologies during training" width="1100" height="860" data-zoom>
+          <figcaption>Proposer synthesis success rate on simple and complex topologies.</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CASE ================= -->
+<section class="band alt" id="case">
+  <div class="wrap">
+    <h2>One Round of Self-Play</h2>
+    <div class="prose">
+      <p>One round of self-play from Qwen2.5-7B training on Freebase, shown verbatim. The Proposer writes a question for a task; the Solver answers it in five rollouts.</p>
+    </div>
+    <div class="case-tabs" role="tablist" id="case-tabs"></div>
+    <div id="case-panel"></div>
+  </div>
+</section>
+
+<!-- ================= CITATION ================= -->
+<section class="band" id="citation">
+  <div class="wrap">
+    <h2>Citation</h2>
+    <div class="bib">
+      <pre id="bibtex">@article{sun2026evolve,
+  title   = {Evolve on Graph: Self-Evolving Knowledge Graph Reasoning without Question Annotations},
+  author  = {Sun, Zongyuan and Zhao, Shuai and Shu, Ke and Zhu, Ziyue and Wu, Shangyang and Lin, Yuanlin and Wang, Tao and Li, Shiyue and Du, Yingjun and Luu, Anh Tuan and Luo, Haoran},
+  journal = {arXiv preprint arXiv:2610.35598},
+  year    = {2026}
+}</pre>
+      <button class="copy" type="button" id="copy-bib">Copy</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Evolve on Graph (EoG) · <a href="https://github.com/Szy5/EoG">github.com/Szy5/EoG</a></div>
+</footer>
+
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged figure">
+  <button type="button" id="lightbox-close" aria-label="Close">×</button>
+  <img id="lightbox-img" src="" alt="">
+</dialog>
+
+<script src="static/js/cases.js"></script>
+<script src="static/js/main.js"></script>
+</body>
+</html>

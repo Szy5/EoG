@@ -1,0 +1,85 @@
+# Dataset config used by the legacy PPO trainer defaults.
+
+# Tokenizer class or path. If null, it is inferred from the actor model.
+tokenizer: null
+
+# Whether to use shared memory for data loading.
+use_shm: false
+
+# Training parquet files. Can be a single path or a list.
+train_files: ~/data/rlhf/gsm8k/train.parquet
+
+# Validation parquet files. Can be a single path or a list.
+val_files: ~/data/rlhf/gsm8k/test.parquet
+
+# Dataset field containing the prompt.
+prompt_key: prompt
+
+# Dataset field used to select the reward function.
+reward_fn_key: data_source
+
+# Maximum prompt length.
+max_prompt_length: 512
+
+# Maximum generated response length.
+max_response_length: 512
+
+# Batch size sampled for one training iteration.
+train_batch_size: 1024
+
+# Validation batch size. Null lets inference engines schedule the full set.
+val_batch_size: null
+
+# Return original input ids without applying the policy chat template.
+return_raw_input_ids: false
+
+# Return raw chat messages for multi-turn rollout parsing.
+return_raw_chat: false
+
+# Return full rendered prompt.
+return_full_prompt: false
+
+# Whether to shuffle training data.
+shuffle: true
+
+# Number of dataloader workers.
+dataloader_num_workers: 8
+
+# Whether to shuffle validation data.
+validation_shuffle: false
+
+# Whether to filter prompts that exceed max_prompt_length.
+filter_overlong_prompts: false
+
+# Worker count for filtering overlong prompts.
+filter_overlong_prompts_workers: 1
+
+# Truncate prompts that exceed max_prompt_length: error, left, or right.
+truncation: error
+
+# Multi-modal image field.
+image_key: images
+
+# Multi-modal video field.
+video_key: videos
+
+# Trust remote tokenizer/model code.
+trust_remote_code: false
+
+# Optional custom dataset class.
+custom_cls:
+  path: null
+  name: null
+
+# Return multi-modal inputs in the dataset.
+return_multi_modal_inputs: true
+
+# Optional custom sampler.
+sampler:
+  class_path: null
+  class_name: null
+
+# Optional custom data generation hook.
+datagen:
+  path: null
+  name: null

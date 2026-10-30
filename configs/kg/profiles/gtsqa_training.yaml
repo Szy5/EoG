@@ -1,0 +1,23 @@
+schema_version: 1
+profile_name: gtsqa_training
+active_graph: gtsqa
+allowed_graphs: [gtsqa]
+graphs:
+  gtsqa:
+    snapshot_id: "gtsqa-ogbl-wikikg2@release-v1+sha256:eb2fe2638848deee60daf7c67aa3b0ff6bc4336198fc2b2b93c46fdc9bc653cb"
+    adapter: gtsqa_array
+    transport:
+      kind: embedded
+    service:
+      index_path: "${GTSQA_INDEX_PATH:-/tmp/kg-platform-gtsqa-index}"
+    expected_capabilities:
+      scope: global
+      reverse_edges_materialized: false
+      supports_literals: false
+policy:
+  relation_candidate_limit: 200
+  max_relations: 50
+  max_requested_relations: 4
+  max_triples_per_relation: 20
+  max_triples_total: 60
+reliability: {}

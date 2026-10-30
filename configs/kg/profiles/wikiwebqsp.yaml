@@ -1,0 +1,17 @@
+schema_version: 1
+profile_name: wikiwebqsp
+active_graph: wikiwebqsp
+allowed_graphs: [wikiwebqsp]
+graphs:
+  wikiwebqsp:
+    snapshot_id: "wikiwebqsp@rog-selected-subgraph-v1"
+    adapter: embedded_sample_graph
+    transport:
+      kind: embedded
+    service: {}
+    expected_capabilities:
+      scope: sample
+      reverse_edges_materialized: false
+      supports_literals: true
+policy: {}
+reliability: {}

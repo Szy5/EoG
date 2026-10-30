@@ -1,0 +1,79 @@
+# SSP-KG Training Dependencies
+#
+# Tested with Python 3.13, CUDA 12.8, PyTorch 2.9
+#
+# Install PyTorch first (match your CUDA version):
+#   pip install --extra-index-url https://download.pytorch.org/whl/cu128 \
+#       "torch==2.9.*" torchvision torchaudio
+
+# ── PyTorch ecosystem ──
+torch>=2.6.0
+torchvision
+torchaudio
+torchdata
+torchao==0.15.0
+flash-attn>=2.7.0                 # build from wheel if needed
+
+# ── Hugging Face ──
+transformers==4.55.0
+datasets
+tokenizers
+huggingface_hub
+accelerate
+peft
+safetensors
+sentencepiece
+
+# ── RL / Training ──
+ray[default]
+tensordict
+hydra-core
+omegaconf
+optree>=0.13.0
+
+# ── Inference engine ──
+sglang==0.4.6.post5
+sgl-kernel>=0.3.20
+cuda-python
+cuda-bindings
+torch_memory_saver
+triton==3.2.0
+
+# ── Reward / Evaluation ──
+openai>=1.60.0                    # LLM-as-a-judge
+math_verify==0.8.0
+
+# ── Serving / API ──
+fastapi>=0.115.0
+uvicorn>=0.34.0
+uvloop
+
+# ── Data ──
+pyarrow>=19.0.1
+pandas
+orjson
+
+# ── Logging ──
+tensorboard>=1.15
+tensorboardX
+wandb
+loguru
+
+# ── Utilities ──
+codetiming
+joblib
+pyzmq
+requests
+tqdm
+jinja2
+PyYAML
+python-dotenv
+numpy
+compressed-tensors
+msgspec
+partial-json-parser
+xgrammar
+qwen_vl_utils
+einops
+SPARQLWrapper
+rank_bm25
